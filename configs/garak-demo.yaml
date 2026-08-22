@@ -1,0 +1,27 @@
+# garak run config for the D3 live demo (Session 4).
+#
+#   .venv/bin/python -m garak --target_type rest \
+#     -G configs/redvault-rest.json --config configs/garak-demo.yaml \
+#     --probes promptinject --report_prefix redvault-baseline
+#
+# Why each key exists:
+#   seed                  - promptinject shuffles and truncates its prompt pool
+#                           (probes/promptinject.py:86). Without a seed, every run
+#                           tests a DIFFERENT random subset, so a rehearsal cannot
+#                           match the live session. Temperature 0 does not fix this:
+#                           it pins the model's sampling, not garak's prompt choice.
+#   soft_probe_prompt_cap - garak's stock cap is 256 prompts per probe. With three
+#                           default-active promptinject classes that is 768 calls;
+#                           10 keeps the on-stage sweep to 30 calls.
+#   generations           - one attempt per prompt. Kept here rather than on the
+#                           command line so the on-screen command stays short.
+#
+# Sizing: measured 0.97 s/call against llama3.1 on an RTX 3050 (30 calls = 28 s)
+# and ~11 s/call on a 4-core CPU-only box (30 calls = ~5.5 min). Time the sweep on
+# YOUR hardware before the session; this cap is what keeps it inside the window.
+#
+# For a wider learner baseline see configs/garak-lab.yaml.
+run:
+  seed: 42
+  soft_probe_prompt_cap: 10
+  generations: 1

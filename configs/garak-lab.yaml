@@ -1,0 +1,22 @@
+# garak run config for the Session 4 learner walkthrough (Lab 1 part 3).
+#
+#   .venv/bin/python -m garak --target_type rest \
+#     -G configs/redvault-rest.json --config configs/garak-lab.yaml \
+#     --probes promptinject --report_prefix redvault-baseline
+#
+# Same idea as configs/garak-demo.yaml but wider: 50 prompts per probe instead of
+# 10, because a baseline you intend to KEEP and diff against later needs a sample
+# size worth trusting. Measured evidence for the difference, llama3.1 @ temp 0:
+#
+#   cap 10 : HijackKillHumans PASS 10/10        <- looks safe
+#   cap 50 : HijackKillHumans FAIL 48/50        <- was never safe; 10 prompts hid it
+#
+# garak also only prints a confidence interval once the sample is large enough,
+# so the cap-10 run gives a bare percentage with no error bars.
+#
+# Cost: 3 probes x 50 = 150 calls. ~2.5 min at 0.97 s/call (GPU), ~27 min at 11 s
+# (CPU-only). Drop soft_probe_prompt_cap entirely for garak's stock 256.
+run:
+  seed: 42
+  soft_probe_prompt_cap: 50
+  generations: 1
