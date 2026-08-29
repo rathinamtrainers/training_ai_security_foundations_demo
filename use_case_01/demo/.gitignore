@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# garak run artifacts, if a rehearsal writes reports into this folder
+*.report.jsonl
+*.report.html
+*.hitlog.jsonl
+garak_runs/
+
+# local env overrides
+.env
