@@ -1,0 +1,51 @@
+UC2 — Steal the model and read a stored embedding
+RedVault at http://localhost:8000: mode=vulnerable backend=ollama guards=[]
+
+========================================================================
+STEP 1 — Model extraction (LLM10 / AML.T0024): clone RedVault
+========================================================================
+[*] harvesting over HTTP from http://localhost:8000/chat
+    ... 50/200 pairs harvested
+    ... 100/200 pairs harvested
+[!] live /chat failed (TimeoutError); falling back to RedVault's in-process pipeline (same code, labelled fallback)
+    ... 150/200 pairs harvested
+    ... 200/200 pairs harvested
+[+] harvested 200 query/response pairs -> stolen.jsonl
+[+] distinct prompts: 47
+[+] behavioural-similarity estimate: 23% (higher = more extractable)
+
+========================================================================
+STEP 2 — Membership inference (stretch, AML.T0024)
+========================================================================
+[*] membership inference by nearest-neighbour confidence (stretch)
+    MEMBER phrase     : 'security awareness module before accessing customer records'
+      best cosine     : 0.402  (nearest doc: 'Onboarding Guide')
+    NON-MEMBER phrase : 'quarterly bonus payout schedule for summer interns'
+      best cosine     : 0.152  (nearest doc: 'Globex Pricing')
+    confidence gap    : +0.250 (positive => the member is distinguishable from the non-member)
+[+] inference: member is separable
+
+========================================================================
+STEP 3 — Embedding inversion (LLM08 / AML.T0024): read stored vectors
+========================================================================
+-- own-tenant row --
+[+] target row 1 (tenant=acme, title='Onboarding Guide')
+[+] reconstructed private text from the vector alone:
+    the onboarding knowledge support security by two confidential shipping day secrets suspect within test 000 into cost on refunds escalate item seat vendor selected prorated laptop portal at guide an incident staff request globex training pricing services first annually 30
+[+] token-recovery overlap with the original: 30%
+
+-- cross-tenant row (attacker=acme, row belongs to globex) --
+[+] target row 5 (tenant=globex, title='Globex Pricing')
+[+] reconstructed private text from the vector alone:
+    enterprise 9 confidential is tier per globex 000 pricing purchasing seat call the cloud two quotes portal chat item as at training request test platform data cost accessing codes original to suspect customer refundable module must or prorated page compare
+[+] token-recovery overlap with the original: 100%
+
+========================================================================
+UC2 acceptance
+========================================================================
+  extraction landed     : True  (200 pairs, similarity 23%, transport=offline)
+  own-tenant inversion  : True  (row 1, overlap 30%)
+  cross-tenant inversion: True  (row 5 globex, overlap 100%)
+UC2 RESULT: PASS - cloned RedVault into stolen.jsonl (similarity 23%) and reconstructed private text from stored vectors, including a cross-tenant row.
+---exit:0---
+preserved live artifact -> stolen_live.jsonl

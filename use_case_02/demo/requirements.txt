@@ -1,0 +1,4 @@
+# UC2 demo — the only third-party dependency is NumPy, for the embedding maths
+# (vector inversion + cosine). Pinned to the RedVault stack so the replica's
+# arithmetic matches the app's stored blobs exactly.
+numpy==2.2.1
